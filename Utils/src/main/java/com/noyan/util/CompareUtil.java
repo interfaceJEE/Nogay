@@ -17,10 +17,14 @@ public class CompareUtil {
 		if (!(object01 instanceof String) || !(object02 instanceof String)) {
 			return equal(object01, object02);
 		}
-		
+
 		String string01 = (String) object01;
 		String string02 = (String) object02;
 
 		return string01.equalsIgnoreCase(string02);
+	}
+
+	public static boolean test() {
+		return true;
 	}
 }
