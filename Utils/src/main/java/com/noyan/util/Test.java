@@ -1,4 +1,4 @@
-package com.noyan.test;
+package com.noyan.util;
 
 public class Test {
 
