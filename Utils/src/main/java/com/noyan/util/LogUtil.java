@@ -10,5 +10,11 @@ public class LogUtil {
 
 	public static void logMessage(Class<?> clazz, Level level, String message) {
 		Logger.getLogger(clazz.getName()).log(level, message);
+
 	}
+
+	public static void logMessage(Object object, String message) {
+		logMessage(object.getClass(), Level.INFO, message);
+	}
+	
 }
