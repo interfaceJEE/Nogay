@@ -9,11 +9,12 @@ public abstract class ServerSocketManager extends Thread {
 
 	private boolean running = false;
 	private byte[] buffer;
-	private int bufferLength = 256;
+	private int bufferLength = 512;
 	private ServerSocketAdapter serverSocketAdapter;
 
 	public ServerSocketManager(ServerSocketAdapter serverSocketAdapter) {
 		setServerSocketAdapter(serverSocketAdapter);
+		setBufferLength(bufferLength);
 	}
 
 	protected abstract void listenSocket();
@@ -24,6 +25,46 @@ public abstract class ServerSocketManager extends Thread {
 
 	public abstract int getPort();
 
+	public abstract InetAddress getInetAddress();
+
+	@Override
+	public void run() {
+		listenSocket();
+	}
+
+	public boolean isRunning() {
+		return running;
+	}
+
+	public void setRunning(boolean running) {
+		this.running = running;
+	}
+
+	public byte[] getBuffer() {
+		return buffer;
+	}
+
+	public ServerSocketAdapter getServerSocketAdapter() {
+		return serverSocketAdapter;
+	}
+
+	public void setServerSocketAdapter(ServerSocketAdapter serverSocketAdapter) {
+		this.serverSocketAdapter = serverSocketAdapter;
+	}
+
+	public int getBufferLength() {
+		return bufferLength;
+	}
+
+	public void flushBuffer() {
+		buffer = new byte[getBufferLength()];
+	}
+
+	public void setBufferLength(int bufferLength) {
+		this.bufferLength = bufferLength;
+		flushBuffer();
+	}
+	
 	public static void main(String[] args) {
 		try {
 			ServerSocketAdapter serverSocketAdapter = new ServerSocketAdapter() {
@@ -53,42 +94,4 @@ public abstract class ServerSocketManager extends Thread {
 			// TODO: handle exception
 		}
 	}
-
-	@Override
-	public void run() {
-		listenSocket();
-	}
-
-	public boolean isRunning() {
-		return running;
-	}
-
-	public void setRunning(boolean running) {
-		this.running = running;
-	}
-
-	public byte[] getBuffer() {
-		return buffer;
-	}
-
-	public void setBuffer(byte[] buffer) {
-		this.buffer = buffer;
-	}
-
-	public ServerSocketAdapter getServerSocketAdapter() {
-		return serverSocketAdapter;
-	}
-
-	public void setServerSocketAdapter(ServerSocketAdapter serverSocketAdapter) {
-		this.serverSocketAdapter = serverSocketAdapter;
-	}
-
-	public int getBufferLength() {
-		return bufferLength;
-	}
-
-	public void setBufferLength(int bufferLength) {
-		this.bufferLength = bufferLength;
-	}
-
 }

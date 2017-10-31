@@ -9,43 +9,34 @@ import java.util.concurrent.CompletableFuture;
 
 import com.noyan.network.socket.ServerSocketAdapter;
 import com.noyan.network.socket.ServerSocketManager;
+import com.noyan.util.NullUtil;
 
 public class UdpServerSocket extends ServerSocketManager {
 
 	private DatagramSocket socket;
 
 	public UdpServerSocket(ServerSocketAdapter serverSocketAdapter, int port) {
-		super(serverSocketAdapter);
-		try {
-			socket = new DatagramSocket(port);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Objects.requireNonNull(serverSocketAdapter);
-			serverSocketAdapter.processException(e);
-		}
+		this(serverSocketAdapter, null, port);
 	}
 
-	public UdpServerSocket(ServerSocketAdapter serverSocketAdapter, String localAddress, int port) {
-		super(serverSocketAdapter);
-		try {
-			socket = new DatagramSocket(port, InetAddress.getByName(localAddress));
-		} catch (Exception e) {
-			e.printStackTrace();
-			Objects.requireNonNull(serverSocketAdapter);
-			serverSocketAdapter.processException(e);
-		}
+	public UdpServerSocket(ServerSocketAdapter serverSocketAdapter, InetAddress localAddress, int port) {
+		this(serverSocketAdapter, localAddress, port, -1);
 	}
 
 	public UdpServerSocket(ServerSocketAdapter serverSocketAdapter, InetAddress localAddress, int port, int bufferLength) {
 		super(serverSocketAdapter);
 		try {
-			socket = new DatagramSocket(port, localAddress);
-			setBuffer(new byte[bufferLength]);
-			setBufferLength(bufferLength);
+			if (NullUtil.isNull(localAddress)) {
+				socket = new DatagramSocket(port);
+			} else {
+				socket = new DatagramSocket(port, localAddress);
+			}
+
+			if (bufferLength > 0) {
+				setBufferLength(bufferLength);
+			}
 		} catch (Exception e) {
-			e.printStackTrace();
-			Objects.requireNonNull(serverSocketAdapter);
-			serverSocketAdapter.processException(e);
+			getServerSocketAdapter().processException(e);
 		}
 	}
 
@@ -59,6 +50,8 @@ public class UdpServerSocket extends ServerSocketManager {
 				CompletableFuture.runAsync(() -> {
 					getServerSocketAdapter().processRecieveData(packet.getData(), packet.getAddress(), packet.getPort());
 				});
+
+				flushBuffer();
 			} catch (Exception e) {
 				getServerSocketAdapter().processException(e);
 			}
@@ -66,11 +59,21 @@ public class UdpServerSocket extends ServerSocketManager {
 	}
 
 	@Override
+	public InetAddress getInetAddress() {
+		if (Objects.isNull(socket)) {
+			return null;
+		}
+
+		return socket.getLocalAddress();
+	}
+
+	@Override
 	public int getPort() {
 		if (Objects.isNull(socket)) {
 			return -1;
 		}
-		return 0;
+
+		return socket.getLocalPort();
 	}
 
 	@Override
@@ -92,5 +95,4 @@ public class UdpServerSocket extends ServerSocketManager {
 			getServerSocketAdapter().processException(e);
 		}
 	}
-
 }

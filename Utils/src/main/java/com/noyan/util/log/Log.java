@@ -12,6 +12,10 @@ import org.apache.log4j.PatternLayout;
 
 public class Log {
 
+	public static ConsoleAppender createConsoleAppender() {
+		return createConsoleAppender(null);
+	}
+
 	public static ConsoleAppender createConsoleAppender(String pattern) {
 		try {
 			ConsoleAppender consoleAppender = new ConsoleAppender();
@@ -45,7 +49,7 @@ public class Log {
 
 	private static Function<String, PatternLayout> getPatternLayout = (pattern) -> {
 		if (Objects.isNull(pattern)) {
-			pattern = "%-7p %d [%t] %c %x - %m%n";
+			pattern = "%-7p %d [%t] %c - %m%n";
 		}
 		PatternLayout layout = new PatternLayout();
 		layout.setConversionPattern(pattern);

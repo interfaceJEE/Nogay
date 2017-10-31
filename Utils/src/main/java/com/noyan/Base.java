@@ -35,5 +35,4 @@ public interface Base {
 	default public String getPrefix() {
 		return "";
 	}
-
 }
